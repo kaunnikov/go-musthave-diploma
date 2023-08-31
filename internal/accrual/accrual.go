@@ -33,12 +33,12 @@ func CheckOrders(accrualURL string) {
 
 	for number := range ch {
 		// Отправляем запрос в систему расчёта баллов
-		resp, err := http.Get(accrualURL + strconv.FormatInt(number, 10))
+		resp, err := fetch(accrualURL + strconv.FormatInt(number, 10))
 		if err != nil {
 			logging.Errorf("Ошибка отправки запроса в систему расчёта баллов: %s", err)
 			continue
 		}
-		defer resp.Body.Close()
+
 		body, err := io.ReadAll(resp.Body)
 
 		if err != nil {
@@ -77,6 +77,12 @@ func CheckOrders(accrualURL string) {
 			}
 		}
 	}
+}
+
+func fetch(URL string) (*http.Response, error) {
+	resp, err := http.Get(URL)
+	defer resp.Body.Close()
+	return resp, err
 }
 
 func generator(numbers []int64) chan int64 {
