@@ -81,7 +81,16 @@ func CheckOrders(accrualURL string) {
 
 func fetch(URL string) (*http.Response, error) {
 	resp, err := http.Get(URL)
-	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logging.Errorf("don't close body: %s", err)
+		}
+	}(resp.Body)
 	return resp, err
 }
 
