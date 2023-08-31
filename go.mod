@@ -7,7 +7,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.4.2
-	github.com/lib/pq v1.10.9
 	github.com/theplant/luhn v0.0.0-20170224032821-81a1a381387a
 	go.uber.org/zap v1.25.0
 )
