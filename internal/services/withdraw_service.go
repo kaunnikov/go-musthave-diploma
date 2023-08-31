@@ -12,7 +12,7 @@ func CreateWithdraw(UUID any, number int64, sum int64) error {
 	_, err := db.Storage.Connect.ExecContext(context.Background(), "INSERT INTO \"withdrawal\" (uuid, order_number, sum) VALUES ($1, $2, $3);",
 		UUID, number, sum)
 	if err != nil {
-		logging.Infof("Don't create(insert) withdrawal: %s", err)
+		logging.Errorf("Don't create(insert) withdrawal: %s", err)
 		return err
 	}
 	return nil

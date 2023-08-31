@@ -29,20 +29,18 @@ func (m *loginRequest) validate() error {
 
 func (m *app) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/json" {
-		logging.Infof("Invalid Content Type: %s", r.Header.Get("Content-Type"))
 		http.Error(w, "Invalid Content Type!", http.StatusBadRequest)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		logging.Infof("cannot read request body: %s", err)
+		logging.Errorf("cannot read request body: %s", err)
 		http.Error(w, fmt.Sprintf("cannot read request body: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	if len(body) == 0 {
-		logging.Infof("empty request body!")
 		http.Error(w, fmt.Sprintf("Empty request body %s", body), http.StatusBadRequest)
 		return
 	}
@@ -50,7 +48,7 @@ func (m *app) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var t loginRequest
 	err = json.Unmarshal(body, &t)
 	if err != nil {
-		logging.Infof("cannot decode request body to `JSON`: %s", err)
+		logging.Errorf("cannot decode request body to `JSON`: %s", err)
 		http.Error(w, fmt.Sprintf("cannot decode request body to `JSON`: %s", err), http.StatusBadRequest)
 		return
 	}
@@ -64,21 +62,21 @@ func (m *app) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	hash := services.GenerateHash(t.Password)
 	uuid, err := services.FindUserByLoginAndPasswordHash(t.Login, hash)
 	if err != nil {
-		logging.Infof("cannot check exists user for login: %s", err)
+		logging.Errorf("cannot check exists user for login: %s", err)
 		http.Error(w, "Error in server!", http.StatusInternalServerError)
 		return
 	}
 
 	// Если пользователь с таким логином или паролем не найден - возвращаем 401
 	if uuid == "" {
-		logging.Infof("user don't logged: %s", t.Login)
+		logging.Errorf("user don't logged: %s", t.Login)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// Записываем в куку JWT
 	if err = auth.SetCookie(w, uuid); err != nil {
-		logging.Infof("Don't create cookie: %s", err)
+		logging.Errorf("Don't create cookie: %s", err)
 		http.Error(w, "Error in server!", http.StatusInternalServerError)
 		return
 	}

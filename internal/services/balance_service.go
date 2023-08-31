@@ -27,7 +27,7 @@ func GetBalanceAccountByUUID(UUID any) (*BalanceAccountResponseMessage, error) {
 	res := db.Storage.Connect.QueryRowContext(context.Background(), query, UUID)
 	err := res.Scan(&b.Current, &b.Withdrawn)
 	if err != nil {
-		logging.Infof("Don't get balance account: %s", err)
+		logging.Errorf("Don't get balance account: %s", err)
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func CalculateBalanceWithWithdraw(UUID any, amount int) error {
 	query := "UPDATE \"balance\" SET current = current - $1, withdrawn = withdrawn + $1 WHERE uuid = $2"
 	_, err := db.Storage.Connect.ExecContext(context.Background(), query, amount, UUID)
 	if err != nil {
-		logging.Infof("Don't calculate balance: %s", err)
+		logging.Errorf("Don't calculate balance: %s", err)
 		return err
 	}
 	return nil

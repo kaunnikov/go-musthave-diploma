@@ -7,8 +7,9 @@ import (
 )
 
 type AppConfig struct {
-	Host        string
-	DatabaseDSN string
+	Host                 string
+	DatabaseDSN          string
+	AccrualSystemAddress string
 }
 
 func LoadConfig() *AppConfig {
@@ -21,6 +22,8 @@ func LoadConfig() *AppConfig {
 func loadFromArgs(cfg *AppConfig) {
 	flag.StringVar(&cfg.Host, "a", "localhost:8080", "Default Host:port")
 	flag.StringVar(&cfg.DatabaseDSN, "d", "", "Database DSN")
+	flag.StringVar(&cfg.AccrualSystemAddress, "r", "", "ACCRUAL SYSTEM ADDRESS")
+
 	flag.Parse()
 }
 
@@ -33,5 +36,10 @@ func loadFromENV(cfg *AppConfig) {
 	databaseDSN := strings.TrimSpace(os.Getenv("DATABASE_DSN"))
 	if databaseDSN != "" {
 		cfg.DatabaseDSN = databaseDSN
+	}
+
+	accrualSystemAddress := strings.TrimSpace(os.Getenv("ACCRUAL_SYSTEM_ADDRESS"))
+	if accrualSystemAddress != "" {
+		cfg.AccrualSystemAddress = accrualSystemAddress
 	}
 }

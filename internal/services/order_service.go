@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+const (
+	StatusNew        = 10
+	StatusProcessing = 20
+	StatusInQueue    = 25 // Промежуточный статус, чтобы повторно не забрать в очередь
+	StatusInvalid    = 30
+	StatusProcessed  = 40
+)
+
 type UserOrdersResponseMessage struct {
 	number          int
 	NumberResponse  string `json:"number"`
@@ -46,7 +54,7 @@ func GetOrderByNumber(n int) (*models.Order, error) {
 		return nil, nil
 	}
 	if err != nil {
-		logging.Infof("Don't checked is can login: %s", err)
+		logging.Errorf("Don't checked is can login: %s", err)
 		return nil, err
 	}
 
@@ -65,7 +73,7 @@ func CreateOrder(n int, UUID any) error {
 	_, err := db.Storage.Connect.ExecContext(context.Background(), "INSERT INTO \"order\" (uuid, number) VALUES ($1, $2);",
 		UUID, n)
 	if err != nil {
-		logging.Infof("Don't create(insert) order: %s", err)
+		logging.Errorf("Don't create(insert) order: %s", err)
 		return err
 	}
 	return nil
@@ -94,22 +102,86 @@ func GetOrdersByUUID(UUID any) ([]UserOrdersResponseMessage, error) {
 		items = append(items, o)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return items, nil
 }
 
+func GetNotProcessedOrderNumbers() ([]int64, error) {
+	// Выставляем промежуточный статус, чтобы не забрать повторно раньше времени
+	query := "UPDATE \"order\" SET status = $1 WHERE \"status\" IN($2,$3)"
+	_, err := db.Storage.Connect.ExecContext(context.Background(), query, StatusInQueue, StatusNew, StatusProcessing)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]int64, 0)
+	query = "SELECT number FROM \"order\" WHERE \"status\" = $1"
+	rows, err := db.Storage.Connect.QueryContext(context.Background(), query, StatusInQueue)
+	if err != nil {
+		return nil, err
+	}
+	defer func(rows *sql.Rows) {
+		_ = rows.Close()
+	}(rows)
+
+	for rows.Next() {
+		var n int64
+		err = rows.Scan(&n)
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, n)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
+func SetProcessingStatusByNumber(number int64) error {
+	query := "UPDATE \"order\" SET status = $1 WHERE \"number\" = $2"
+	_, err := db.Storage.Connect.ExecContext(context.Background(), query, StatusProcessing, number)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetInvalidStatusByNumber(number int64) error {
+	query := "UPDATE \"order\" SET status = $1 WHERE \"number\" = $2"
+	_, err := db.Storage.Connect.ExecContext(context.Background(), query, StatusInvalid, number)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetProcessedStatusByNumber(number int64, accrual int) error {
+	query := "UPDATE \"order\" SET status = $1, accrual = $2 WHERE \"number\" = $3"
+	_, err := db.Storage.Connect.ExecContext(context.Background(), query, StatusProcessed, accrual, number)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func getStatusLabelById(statusID int) string {
 	switch statusID {
-	case 10:
+	case StatusNew:
 		return "NEW"
-	case 20:
+	case StatusProcessing:
 		return "PROCESSING"
-	case 30:
+	case StatusInQueue:
+		return "PROCESSING"
+	case StatusInvalid:
 		return "INVALID"
-	case 40:
+	case StatusProcessed:
 		return "PROCESSED"
 	}
 	return "UNDEFINED"

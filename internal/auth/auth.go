@@ -46,7 +46,6 @@ func generateJWTString(UUID string) (string, error) {
 		Token: uuid.NewString(),
 		UUID:  UUID,
 	})
-	logging.Infof("Кладём в куку UUID: %s", UUID)
 
 	return token.SignedString([]byte(SecretKey))
 }

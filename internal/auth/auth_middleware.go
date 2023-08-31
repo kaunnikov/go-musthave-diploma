@@ -66,7 +66,6 @@ func CustomAuthMiddleware(h http.Handler) http.Handler {
 
 		// Прокидываем UUID в контекст
 		ctx := context.WithValue(r.Context(), "uuid", claims.UUID)
-		logging.Infof("Достали UUID: %s", claims.UUID)
 
 		h.ServeHTTP(w, r.WithContext(ctx))
 	}

@@ -53,8 +53,6 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if order != nil {
-		logging.Infof("текущий UUID: %s", r.Context().Value("uuid"))
-		logging.Infof("UUID заказа : %s", order.UUID)
 		// Если есть и загружен этим пользователем - ответ 200
 		if order.UUID == UUID {
 			logging.Infof("Заказ %d зарегистрирован этим пользователем ранее", number)

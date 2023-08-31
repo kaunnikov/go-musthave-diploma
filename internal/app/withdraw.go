@@ -21,20 +21,18 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 	UUID := r.Context().Value("uuid")
 
 	if r.Header.Get("Content-Type") != "application/json" {
-		logging.Infof("Invalid Content Type: %s", r.Header.Get("Content-Type"))
 		http.Error(w, "Invalid Content Type!", http.StatusBadRequest)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		logging.Infof("cannot read request body: %s", err)
+		logging.Errorf("cannot read request body: %s", err)
 		http.Error(w, fmt.Sprintf("cannot read request body: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	if len(body) == 0 {
-		logging.Infof("empty request body!")
 		http.Error(w, fmt.Sprintf("Empty request body %s", body), http.StatusBadRequest)
 		return
 	}
@@ -42,7 +40,7 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 	var wr withdrawRequest
 	err = json.Unmarshal(body, &wr)
 	if err != nil {
-		logging.Infof("cannot decode request body to `JSON`: %s", err)
+		logging.Errorf("cannot decode request body to `JSON`: %s", err)
 		http.Error(w, fmt.Sprintf("cannot decode request body to `JSON`: %s", err), http.StatusBadRequest)
 		return
 	}
@@ -95,7 +93,7 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Commit the transaction.
 	if err = tx.Commit(); err != nil {
-		logging.Infof("Ошибка выполнения commit: %s", err)
+		logging.Errorf("Ошибка выполнения commit: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

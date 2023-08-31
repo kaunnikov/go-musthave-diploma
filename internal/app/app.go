@@ -41,6 +41,4 @@ func (m *app) registerRoutes() {
 		r.Post("/api/user/balance/withdraw", m.WithdrawHandler)
 		r.Get("/api/user/withdrawals", m.GetWithdrawsHandler)
 	})
-
-	//m.Get("/api/orders/{number}", nil)
 }

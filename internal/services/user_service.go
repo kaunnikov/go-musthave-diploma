@@ -40,7 +40,7 @@ func LoginIfExists(login string) (bool, error) {
 	res := db.Storage.Connect.QueryRowContext(context.Background(), query, login)
 	err := res.Scan(&isExists)
 	if err != nil {
-		logging.Infof("Don't checked login if exists: %s", err)
+		logging.Errorf("Don't checked login if exists: %s", err)
 		return false, err
 	}
 
@@ -53,7 +53,7 @@ func UUIDIfExists(UUID any) (bool, error) {
 	res := db.Storage.Connect.QueryRowContext(context.Background(), query, UUID)
 	err := res.Scan(&isExists)
 	if err != nil {
-		logging.Infof("Don't checked UUID if exists: %s", err)
+		logging.Errorf("Don't checked UUID if exists: %s", err)
 		return false, err
 	}
 
@@ -64,7 +64,7 @@ func createUser(u *models.User) error {
 	_, err := db.Storage.Connect.ExecContext(context.Background(), "INSERT INTO \"user\" (uuid, login, password_hash) VALUES ($1, $2, $3);",
 		u.UUID, u.Login, u.PasswordHash)
 	if err != nil {
-		logging.Infof("Don't create(insert) user: %s", err)
+		logging.Errorf("Don't create(insert) user: %s", err)
 		return err
 	}
 	return nil
@@ -79,7 +79,7 @@ func FindUserByLoginAndPasswordHash(login string, hash string) (string, error) {
 		return "", nil
 	}
 	if err != nil {
-		logging.Infof("Don't checked is can login: %s", err)
+		logging.Errorf("Don't checked is can login: %s", err)
 		return "", err
 	}
 

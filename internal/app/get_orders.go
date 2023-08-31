@@ -12,7 +12,7 @@ func (m *app) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 	UUID := r.Context().Value("uuid")
 	orders, err := services.GetOrdersByUUID(UUID)
 	if err != nil {
-		logging.Infof("Ошибка получения заказов пользователя: %s", err)
+		logging.Errorf("Ошибка получения заказов пользователя: %s", err)
 		http.Error(w, "Error in server!", http.StatusInternalServerError)
 		return
 	}
@@ -24,7 +24,7 @@ func (m *app) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := json.Marshal(orders)
 	if err != nil {
-		logging.Infof("cannot encode response: %s", err)
+		logging.Errorf("cannot encode response: %s", err)
 		http.Error(w, "Error in server!", http.StatusInternalServerError)
 		return
 	}
