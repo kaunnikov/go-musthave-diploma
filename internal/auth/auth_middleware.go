@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
-const SecretKey = "UZo57ez$4e2V"
-const CookieTokenName = "token"
+const (
+	SecretKey       = "UZo57ez$4e2V"
+	CookieTokenName = "token"
+	UUIDKField      = "uuid"
+)
 
 func CustomAuthMiddleware(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +68,7 @@ func CustomAuthMiddleware(h http.Handler) http.Handler {
 		}
 
 		// Прокидываем UUID в контекст
-		ctx := context.WithValue(r.Context(), "uuid", claims.UUID)
+		ctx := context.WithValue(r.Context(), UUIDKField, claims.UUID)
 
 		h.ServeHTTP(w, r.WithContext(ctx))
 	}

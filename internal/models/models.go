@@ -12,7 +12,7 @@ type User struct {
 }
 
 type Order struct {
-	Id         int
+	ID         int
 	UUID       string        `json:"uuid"`
 	Number     int           `json:"number"`
 	Accrual    sql.NullInt64 `json:"accrual,omitempty"`

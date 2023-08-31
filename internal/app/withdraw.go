@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/theplant/luhn"
 	"io"
+	"kaunnikov/internal/auth"
 	"kaunnikov/internal/db"
 	"kaunnikov/internal/logging"
 	"kaunnikov/internal/services"
@@ -18,7 +19,7 @@ type withdrawRequest struct {
 }
 
 func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value("uuid")
+	UUID := r.Context().Value(auth.UUIDKField)
 
 	if r.Header.Get("Content-Type") != "application/json" {
 		http.Error(w, "Invalid Content Type!", http.StatusBadRequest)

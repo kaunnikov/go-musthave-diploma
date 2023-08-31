@@ -2,13 +2,14 @@ package app
 
 import (
 	"encoding/json"
+	"kaunnikov/internal/auth"
 	"kaunnikov/internal/logging"
 	"kaunnikov/internal/services"
 	"net/http"
 )
 
 func (m *app) UserBalanceHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value("uuid")
+	UUID := r.Context().Value(auth.UUIDKField)
 	balance, err := services.GetBalanceAccountByUUID(UUID)
 	if err != nil {
 		http.Error(w, "Error in server!", http.StatusInternalServerError)

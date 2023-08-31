@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/theplant/luhn"
 	"io"
+	"kaunnikov/internal/auth"
 	"kaunnikov/internal/logging"
 	"kaunnikov/internal/services"
 	"net/http"
@@ -38,7 +39,7 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if number == 0 || luhn.Valid(number) == false {
+	if number == 0 || !luhn.Valid(number) {
 		logging.Infof("Номер %s не прошёл валидацию Луна", string(responseData))
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
@@ -52,7 +53,7 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UUID := r.Context().Value("uuid")
+	UUID := r.Context().Value(auth.UUIDKField)
 	if UUID == "" {
 		logging.Errorf("Потеряли UUID")
 		http.Error(w, "Error in server!", http.StatusInternalServerError)

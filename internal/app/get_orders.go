@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"kaunnikov/internal/auth"
 	"kaunnikov/internal/logging"
 	"kaunnikov/internal/services"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 
 func (m *app) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 
-	UUID := r.Context().Value("uuid")
+	UUID := r.Context().Value(auth.UUIDKField)
 	orders, err := services.GetOrdersByUUID(UUID)
 	if err != nil {
 		logging.Errorf("Ошибка получения заказов пользователя: %s", err)

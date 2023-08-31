@@ -3,13 +3,14 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"kaunnikov/internal/auth"
 	"kaunnikov/internal/logging"
 	"kaunnikov/internal/services"
 	"net/http"
 )
 
 func (m *app) GetWithdrawsHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value("uuid")
+	UUID := r.Context().Value(auth.UUIDKField)
 
 	// Получим отсортированный по времени список вывода средств пользователя
 	result, err := services.GetWithdrawByUUID(UUID)

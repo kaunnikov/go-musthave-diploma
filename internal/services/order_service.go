@@ -33,7 +33,7 @@ func (m *UserOrdersResponseMessage) prepareData() {
 	if m.accrual.Int64 > 0 {
 		m.AccrualResponse = float64(m.accrual.Int64) / float64(100)
 	}
-	m.StatusResponse = getStatusLabelById(m.status)
+	m.StatusResponse = getStatusLabelByID(m.status)
 
 }
 
@@ -59,7 +59,7 @@ func GetOrderByNumber(n int) (*models.Order, error) {
 	}
 
 	order := models.Order{
-		Id:         id,
+		ID:         id,
 		UUID:       UUID,
 		Number:     number,
 		Accrual:    accrual,
@@ -171,7 +171,7 @@ func SetProcessedStatusByNumber(number int64, accrual int) error {
 	return nil
 }
 
-func getStatusLabelById(statusID int) string {
+func getStatusLabelByID(statusID int) string {
 	switch statusID {
 	case StatusNew:
 		return "NEW"

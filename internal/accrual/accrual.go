@@ -9,13 +9,13 @@ import (
 	"strconv"
 )
 
-type RespApi struct {
+type RespAPI struct {
 	Order   string  `json:"order"`
 	Status  string  `json:"status"`
 	Accrual float32 `json:"accrual"`
 }
 
-func CheckOrders(accrualUrl string) {
+func CheckOrders(accrualURL string) {
 	// Забираем из БД номера нерасчитанных заказов
 	//(временно выставляем им промежуточный статус, в итоге возвращаем в Processing, либо проставляем обработанный статус Invalid/Processed)
 	numbers, err := services.GetNotProcessedOrderNumbers()
@@ -33,13 +33,17 @@ func CheckOrders(accrualUrl string) {
 
 	for number := range ch {
 		// Отправляем запрос в систему расчёта баллов
-		resp, err := http.Get(accrualUrl + strconv.FormatInt(number, 10))
+		resp, err := http.Get(accrualURL + strconv.FormatInt(number, 10))
 		if err != nil {
 			logging.Errorf("Ошибка отправки запроса в систему расчёта баллов: %s", err)
 			continue
 		}
-		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
+
+		if err != nil {
+			logging.Errorf("cannot read request body: %s", err)
+			return
+		}
 
 		// Заказа нет в системе - убираем в Invalid
 		switch resp.StatusCode {
@@ -48,7 +52,7 @@ func CheckOrders(accrualUrl string) {
 				logging.Errorf("Не смогли установить статуст Invalid: %s", err)
 			}
 		case http.StatusOK:
-			var s RespApi
+			var s RespAPI
 			err = json.Unmarshal(body, &s)
 			if err != nil {
 				logging.Errorf("cannot decode response: %s", err)
