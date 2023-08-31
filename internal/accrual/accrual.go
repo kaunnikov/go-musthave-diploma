@@ -76,6 +76,10 @@ func checkOrder(accrualURL string, number int64) {
 			if err = services.SetProcessedStatusByNumber(number, int(s.Accrual*100)); err != nil {
 				logging.Errorf("Не смогли установить статуст Processed: %s", err)
 			}
+			// Добавляем баланс пользователю
+			if err = services.AddAccrualByNumber(number, int(s.Accrual*100)); err != nil {
+				logging.Errorf("Не смогли добавить баланс пользователю: %s", err)
+			}
 		default:
 			// Выставляем обратно статус Processing, чтобы взять в работу снова через N времени
 			if err = services.SetProcessingStatusByNumber(number); err != nil {

@@ -22,7 +22,6 @@ func CreateBalanceAccountByUUID(UUID any) error {
 
 func GetBalanceAccountByUUID(UUID any) (*BalanceAccountResponseMessage, error) {
 	var b BalanceAccountResponseMessage
-	logging.Infof("UUID: %s", UUID)
 	query := "SELECT CAST(current AS FLOAT) / CAST(100 AS FLOAT) as current, CAST(withdrawn AS FLOAT) / CAST(100 AS FLOAT) as withdrawn FROM \"balance\" WHERE \"uuid\"=$1"
 	res := db.Storage.Connect.QueryRowContext(context.Background(), query, UUID)
 	err := res.Scan(&b.Current, &b.Withdrawn)
@@ -32,6 +31,15 @@ func GetBalanceAccountByUUID(UUID any) (*BalanceAccountResponseMessage, error) {
 	}
 
 	return &b, nil
+}
+
+func AddAccrualByNumber(number int64, sum int) error {
+	query := "UPDATE \"balance\" SET current = current + $1 WHERE uuid = (SELECT uuid FROM \"order\" where number = $2)"
+	_, err := db.Storage.Connect.ExecContext(context.Background(), query, sum, number)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func CalculateBalanceWithWithdraw(UUID any, amount int) error {
