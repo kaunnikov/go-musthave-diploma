@@ -32,6 +32,12 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Првоеряем на корректность Луна
 	number, err := strconv.Atoi(string(responseData))
+	if err != nil {
+		logging.Errorf("Не удалось преобразовать в число: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	if number == 0 || luhn.Valid(number) == false {
 		logging.Infof("Номер %s не прошёл валидацию Луна", string(responseData))
 		w.WriteHeader(http.StatusUnprocessableEntity)
@@ -72,7 +78,5 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logging.Infof("Заказ %d принят!", number)
 	w.WriteHeader(http.StatusAccepted)
-	return
 }

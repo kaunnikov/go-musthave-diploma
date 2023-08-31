@@ -46,6 +46,11 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	number, err := strconv.Atoi(wr.Number)
+	if err != nil {
+		logging.Errorf("Не удалось преобразовать в число: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	if number == 0 {
 		logging.Infof("Неверный номер заказа: %s", wr.Number)
 		w.WriteHeader(http.StatusUnprocessableEntity)
@@ -60,8 +65,8 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Получим баланс пользователя
 	balanceAccount, err := services.GetBalanceAccountByUUID(UUID)
-	if !luhn.Valid(number) {
-		logging.Infof("Не удалось получить баланс пользователя: %s", err)
+	if err != nil {
+		logging.Errorf("Не удалось получить баланс пользователя: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -99,5 +104,4 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	return
 }
