@@ -44,12 +44,7 @@ func checkOrder(accrualURL string, number int64) {
 		logging.Errorf("Ошибка отправки запроса в систему расчёта баллов: %s", err)
 		return
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			logging.Errorf("don't close body: %s", err)
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 
