@@ -10,7 +10,7 @@ import (
 
 func (m *app) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 
-	UUID := r.Context().Value(auth.UUIDKField)
+	UUID := r.Context().Value(auth.UUIDContextKey)
 	orders, err := services.GetOrdersByUUID(UUID)
 	if err != nil {
 		logging.Errorf("Ошибка получения заказов пользователя: %s", err)

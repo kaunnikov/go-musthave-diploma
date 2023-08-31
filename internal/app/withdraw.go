@@ -19,7 +19,7 @@ type withdrawRequest struct {
 }
 
 func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value(auth.UUIDKField)
+	UUID := r.Context().Value(auth.UUIDContextKey)
 
 	if r.Header.Get("Content-Type") != "application/json" {
 		http.Error(w, "Invalid Content Type!", http.StatusBadRequest)
@@ -89,7 +89,11 @@ func (m *app) WithdrawHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Записываем в БД списание
 	sum := int64(wr.Sum * 100)
-	services.CreateWithdraw(UUID, int64(number), sum)
+	if err = services.CreateWithdraw(UUID, int64(number), sum); err != nil {
+		logging.Errorf("Don't create(insert) withdrawal: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// Вычитаем из баланса, добавляем в сумму потраченных баллов
 	if err := services.CalculateBalanceWithWithdraw(UUID, int(wr.Sum*100)); err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 func (m *app) UserBalanceHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value(auth.UUIDKField)
+	UUID := r.Context().Value(auth.UUIDContextKey)
 	balance, err := services.GetBalanceAccountByUUID(UUID)
 	if err != nil {
 		http.Error(w, "Error in server!", http.StatusInternalServerError)

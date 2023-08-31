@@ -53,7 +53,7 @@ func (m *app) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UUID := r.Context().Value(auth.UUIDKField)
+	UUID := r.Context().Value(auth.UUIDContextKey)
 	if UUID == "" {
 		logging.Errorf("Потеряли UUID")
 		http.Error(w, "Error in server!", http.StatusInternalServerError)

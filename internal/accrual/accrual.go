@@ -38,6 +38,7 @@ func CheckOrders(accrualURL string) {
 			logging.Errorf("Ошибка отправки запроса в систему расчёта баллов: %s", err)
 			continue
 		}
+		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 
 		if err != nil {

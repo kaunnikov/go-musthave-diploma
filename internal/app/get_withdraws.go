@@ -10,7 +10,7 @@ import (
 )
 
 func (m *app) GetWithdrawsHandler(w http.ResponseWriter, r *http.Request) {
-	UUID := r.Context().Value(auth.UUIDKField)
+	UUID := r.Context().Value(auth.UUIDContextKey)
 
 	// Получим отсортированный по времени список вывода средств пользователя
 	result, err := services.GetWithdrawByUUID(UUID)
