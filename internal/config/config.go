@@ -28,12 +28,12 @@ func loadFromArgs(cfg *AppConfig) {
 }
 
 func loadFromENV(cfg *AppConfig) {
-	envRunAddr := strings.TrimSpace(os.Getenv("SERVER_ADDRESS"))
+	envRunAddr := strings.TrimSpace(os.Getenv("RUN_ADDRESS"))
 	if envRunAddr != "" {
 		cfg.Host = envRunAddr
 	}
 
-	databaseDSN := strings.TrimSpace(os.Getenv("DATABASE_DSN"))
+	databaseDSN := strings.TrimSpace(os.Getenv("DATABASE_URI"))
 	if databaseDSN != "" {
 		cfg.DatabaseDSN = databaseDSN
 	}
